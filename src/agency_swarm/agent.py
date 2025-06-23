@@ -8,7 +8,7 @@ import sys
 import warnings
 from collections.abc import AsyncGenerator, Callable
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import Any, TypeVar, Dict, List, Literal, Optional, Union
 
 from agents import (
     Agent as BaseAgent,
@@ -42,6 +42,16 @@ from .tools import BaseTool
 from .tools.send_message import SendMessage
 from .tools.utils import from_openapi_schema, validate_openapi_spec
 from .utils.agent_file_manager import AgentFileManager
+from .constants import DEFAULT_MODEL
+from .tools import (
+    CodeInterpreter,
+    FileSearch,
+    Retrieval,
+    ToolFactory,
+)
+from .tools.oai.FileSearch import FileSearchConfig
+from .util.oai import get_openai_client
+from .util.shared_state import SharedState
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +82,13 @@ SEND_MESSAGE_TOOL_PREFIX = "send_message_to_"
 MESSAGE_PARAM = "message"
 
 T = TypeVar("T", bound="Agent")
+
+
+class ExampleMessage(TypedDict):
+    role: Literal["user", "assistant"]
+    content: str
+    attachments: Optional[List[dict]]
+    metadata: Optional[Dict[str, str]]
 
 
 class Agent(BaseAgent[MasterContext]):
